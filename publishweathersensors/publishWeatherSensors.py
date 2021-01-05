@@ -82,7 +82,7 @@ def run():
       else: # got line
           pulse -= 1
           sLine = line.decode()
-          print(sLine)
+          # print(sLine)
           #   See if the data is something we need to act on...
           if (( sLine.find('F007TH') != -1) or ( sLine.find('F016TH') != -1)):
               sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')

@@ -5,7 +5,7 @@ description = ""
 authors = ["Philip Cutler <greenthegarden@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.7"
 paho-mqtt = "^1.5.1"
 
 [tool.poetry.dev-dependencies]
