@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "publishWeatherSensors"
+version = "0.1.0"
+description = ""
+authors = ["Philip Cutler <greenthegarden@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+paho-mqtt = "^1.5.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[tool.poetry.scripts]
+my-script = "publishweathersensors.main:main"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
