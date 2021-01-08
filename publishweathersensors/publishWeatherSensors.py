@@ -91,7 +91,7 @@ def run():
           if (( sLine.find('F007TH') != -1) or ( sLine.find('F016TH') != -1)):
               sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')
               data = parseF016TH(sLine)
-              topic = '/'.join(['weathersense', 'indoorth', str(data.get('device'))])
+              topic = '/'.join(['weathersense', 'indoorth', str(data.get('channel'))])
           if (( sLine.find('FT0300') != -1) or ( sLine.find('FT020T') != -1)):
               sys.stdout.write('WeatherSense WeatherRack2 FT020T found' + '\n')
               data = parseFT020T(sLine)
