@@ -1,6 +1,7 @@
 # test for WeatherSense SwitchDoc Labs Weather Sensors
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------------------------------------------------------------------------------
+from os import EX_DATAERR
 import sys
 from subprocess import PIPE, Popen, STDOUT
 from threading  import Thread
@@ -23,7 +24,7 @@ def tempFtoC(temp_F):
 
 def parseF016TH(sLine):
     data = json.loads(sLine)
-    data['temperature_F'] = tempFtoC(data.get('temperature_F'))
+    data['temperature'] = tempFtoC(data.get('temperature_F'))
     return json.dumps(data)
 
 def parseFT020T(sLine):
@@ -82,17 +83,20 @@ def run():
       else: # got line
           pulse -= 1
           sLine = line.decode()
+          data = ""
+          topic = ""
           # print(sLine)
           #   See if the data is something we need to act on...
           if (( sLine.find('F007TH') != -1) or ( sLine.find('F016TH') != -1)):
               sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')
-              # sys.stdout.write('This is the raw data: ' + sLine + '\n')
-              sys.stdout.write(parseF016TH(sLine) + '\n')
-              publish.single("weathersense/indoorth/single", parseF016TH(sLine), hostname="192.168.1.53")
+              data = parseF016TH(sLine)
+              topic = '/'.join(['weathersense', 'indoorth', str(data.get("device"))])
           if (( sLine.find('FT0300') != -1) or ( sLine.find('FT020T') != -1)):
               sys.stdout.write('WeatherSense WeatherRack2 FT020T found' + '\n')
-              sys.stdout.write(parseFT020T(sLine) + '\n')
-              publish.single("weathersense/weatherrack2/single", parseFT020T(sLine), hostname="192.168.1.53")
-
+              data = parseFT020T(sLine)
+              topic = '/'.join(['weathersense', 'weatherrack2', str(data.get("device"))])
+          if topic:
+              sys.stdout.write(json.dumps(data) + '\n')
+              publish.single(topic, json.dumps(data), hostname="192.168.1.53")
 
       sys.stdout.flush()
