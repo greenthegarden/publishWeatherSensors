@@ -25,7 +25,7 @@ def tempFtoC(temp_F):
 def parseF016TH(sLine):
     data = json.loads(sLine)
     data['temperature'] = tempFtoC(data.get('temperature_F'))
-    return json.dumps(data)
+    return data
 
 def parseFT020T(sLine):
     data = json.loads(sLine)
@@ -34,7 +34,7 @@ def parseFT020T(sLine):
     data['cumulativerain'] = data.get('cumulativerain')/10
     data['temperature'] = tempFtoC((data.get('temperature')-400)/10)
     data['uv'] = data.get('uv')/10
-    return json.dumps(data)
+    return data
 
 def run():
 
@@ -83,7 +83,7 @@ def run():
       else: # got line
           pulse -= 1
           sLine = line.decode()
-          data = ""
+          data = dict()
           topic = ""
           # print(sLine)
           #   See if the data is something we need to act on...
