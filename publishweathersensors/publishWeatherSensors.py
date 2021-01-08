@@ -29,11 +29,11 @@ def parseF016TH(sLine):
 
 def parseFT020T(sLine):
     data = json.loads(sLine)
-    data['avewindspeed'] = data.get('avewindspeed')/10
-    data['gustwindspeed'] = data.get('gustwindspeed')/10
-    data['cumulativerain'] = data.get('cumulativerain')/10
-    data['temperature'] = tempFtoC((data.get('temperature')-400)/10)
-    data['uv'] = data.get('uv')/10
+    data['avewindspeed'] = data.get('avewindspeed')/10.0
+    data['gustwindspeed'] = data.get('gustwindspeed')/10.0
+    data['cumulativerain'] = data.get('cumulativerain')/10.0
+    data['temperature'] = tempFtoC((data.get('temperature')-400)/10.0)
+    data['uv'] = data.get('uv')/10.0
     return data
 
 def run():
@@ -90,13 +90,13 @@ def run():
           if (( sLine.find('F007TH') != -1) or ( sLine.find('F016TH') != -1)):
               sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')
               data = parseF016TH(sLine)
-              topic = '/'.join(['weathersense', 'indoorth', str(data.get("device"))])
+              topic = '/'.join(['weathersense', 'indoorth', str(data.get('device'))])
           if (( sLine.find('FT0300') != -1) or ( sLine.find('FT020T') != -1)):
               sys.stdout.write('WeatherSense WeatherRack2 FT020T found' + '\n')
               data = parseFT020T(sLine)
-              topic = '/'.join(['weathersense', 'weatherrack2', str(data.get("device"))])
+              topic = '/'.join(['weathersense', 'weatherrack2', str(data.get('device'))])
           if topic:
               sys.stdout.write(json.dumps(data) + '\n')
-              publish.single(topic, json.dumps(data), hostname="192.168.1.53")
+              publish.single(topic.lower(), json.dumps(data), hostname='192.168.1.53')
 
       sys.stdout.flush()
