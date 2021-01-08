@@ -25,6 +25,7 @@ def tempFtoC(temp_F):
 def parseF016TH(sLine):
     data = json.loads(sLine)
     data['temperature'] = tempFtoC(data.get('temperature_F'))
+    data.pop('temperature_F', None)
     return data
 
 def parseFT020T(sLine):
