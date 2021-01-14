@@ -22,12 +22,44 @@ def nowStr():
 def tempFtoC(temp_F):
     return (temp_F - 32) * (5/9.0)
 
+# For data details see https://shop.switchdoc.com/products/wireless-weatherrack2
+
+# Data Sample
+# {"time" : "2020-07-09 10:54:16", "model" : "SwitchDoc Labs F007TH Thermo-Hygrometer", "device" : 233, "modelnumber" : 5, "channel" : 3, "battery" : "OK", "temperature_F" : 72.100, "humidity" : 45, "mic" : "CRC"}
+
+# Raw Data Description
+# time: Time of Message Reception
+# model: SwitchDoc Labs F007TH Thermo-Hygrometer
+# device: Serial Number of the sensor - changed on powerup but can be used to discriminate from other similar sensors in the area
+# modelnumber: 
+# channel: 
+# battery: "OK" if battery good, "x" if battery is getting low
+# temperature_F: temperature in F
+# humidity: Relative Humidity in %.
+# mic: "CRC" ???
 def parseF016TH(sLine):
     data = json.loads(sLine)
     data['temperature'] = tempFtoC(data.get('temperature_F'))
     data.pop('temperature_F', None)
     return data
 
+# Data Sample
+# {"time" : "2020-11-22 06:40:15", "model" : "SwitchDoc Labs FT020T AIO", "device" : 12, "id" : 0, "batterylow" : 0, "avewindspeed" : 2, "gustwindspeed" : 3, "winddirection" : 18, "cumulativerain" : 180, "temperature" : 1011, "humidity" : 27, "light" : 1432, "uv" : 4, "mic" : "CRC"}
+
+# Raw Data Description
+# time: Time of Message Reception
+# model: SwitchDoc Labs FT020T AIO
+# device: Serial Number of the sensor - changed on powerup but can be used to discriminate from other similar sensors in the area
+# batterylow: 0 if battery good, 1 if battery is getting low
+# avewindspeed: Average Wind Speed in m/s *10
+# gustwindspeed: Last Gust Speed in m/s *10
+# winddirection: Wind Direction in degrees from 0-359.
+# cumulativerain: Total rain since last reset or power off. in mm.*10
+# temperature: outside temperature in F with 400 offset and *10 T = (value-400)/10.0
+# humidity: Relative Humidity in %.
+# light: Visible Sunlight in lux.
+# uv: UV Index * 10
+# "mic": "CRC" ???
 def parseFT020T(sLine):
     data = json.loads(sLine)
     data['avewindspeed'] = data.get('avewindspeed')/10.0
