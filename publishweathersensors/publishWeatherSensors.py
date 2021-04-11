@@ -78,7 +78,6 @@ class reportIndoorSensor:
     battery: str
     temperature: float
     humidity: float
-    mic: str
 
 # For data details see https://shop.switchdoc.com/products/wireless-weatherrack2
 
@@ -138,12 +137,16 @@ class reportWeatherSensor:
     device: int
     avewindspeed: int
     gustwindspeed: int
+    dailyrainfall: float
+    monthlyrainfall: float
+    annualrainfall: float
     temperature: float
     light: int
     uv: int
     batterylow: float
     winddirection: int
     humidity: float
+
 
 # Data Sample
 # {"time" : "2020-11-22 06:40:15", "model" : "SwitchDoc Labs FT020T AIO", "device" : 12, "id" : 0, "batterylow" : 0, "avewindspeed" : 2, "gustwindspeed" : 3, "winddirection" : 18, "cumulativerain" : 180, "temperature" : 1011, "humidity" : 27, "light" : 1432, "uv" : 4, "mic" : "CRC"}
@@ -212,7 +215,10 @@ class reportFT020T:
             annual_rainfall.update(self.cumulativerain),
             self.temperature,
             self.light,
-            self.uv
+            self.uv,
+            self.batterylow,
+            self.winddirection,
+            self.humidity
         )
 
 
