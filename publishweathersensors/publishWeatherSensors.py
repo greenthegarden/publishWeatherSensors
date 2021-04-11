@@ -20,11 +20,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 class RainfallTotal:
     zero: float = 0.0
     total: float = 0.0
+    cumulative: float = 0.0
 
-    def reset(self, cumulative: float):
-        self.zero = cumulative
+    def reset(self): 
+        self.zero = self.cumulative
 
     def update(self, cumulative: float) -> float:
+        self.cumulative = cumulative
         self.total = cumulative - self.zero
         return self.total
     
