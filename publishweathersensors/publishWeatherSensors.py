@@ -61,11 +61,20 @@ scheduler.start()
 def nowStr() -> str:
     return(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
+
+class EnhancedJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if dataclasses.is_dataclass(o):
+            return dataclasses.asdict(o)
+        return super().default(o)
+
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 #stripped = lambda s: "".join(i for i in s if 31 < ord(i) < 127)
 
 def tempFtoC(temp_F: int) -> float:
     return (temp_F - 32) * (5/9.0)
+
 
 
 @dataclass
@@ -302,6 +311,6 @@ def run():
             if topic:
                 sys.stdout.write(json.dumps(data) + '\n')
                 publish.single(topic.lower(), json.dumps(
-                    data), hostname='192.168.1.53')
+                    data, cls=EnhancedJSONEncoder), hostname='192.168.1.53')
 
         sys.stdout.flush()
