@@ -272,9 +272,8 @@ def run():
                 # data = parseF016TH(sLine)
                 schema = desert.schema(reportF016TH, meta={"unknown": EXCLUDE})
                 try:
-                    sys.stdout.write(json.loads(sLine) + '\n')
+                    sys.stdout.write(sLine + '\n')
                     data = schema.load(json.loads(sLine)).to_reportIndoorSensor()
-                    sys.stdout.write(data + '\n')
                     topic = '/'.join(['weathersense', 'indoorth',
                                      str(data.channel)])
                 except ValidationError as err:
@@ -286,10 +285,9 @@ def run():
                 # data = parseFT020T(sLine)
                 schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
                 try:
-                    sys.stdout.write(json.loads(sLine) + '\n')
+                    sys.stdout.write(sLine + '\n')
                     data = schema.load(json.loads(
                         sLine)).to_reportWeatherSensor()
-                    sys.stdout.write(data + '\n')
                     topic = '/'.join(['weathersense', 'weatherrack2',
                                  str(data.get('device'))])
                 except ValidationError as err:
