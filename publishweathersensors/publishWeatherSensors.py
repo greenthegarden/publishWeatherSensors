@@ -38,9 +38,12 @@ daily_rainfall = RainfallTotal()
 monthly_rainfall = RainfallTotal()
 annual_rainfall = RainfallTotal()
 
+daily_rainfall_reset = daily_rainfall.reset()
+monthly_rainfall_reset = monthly_rainfall.reset()
+annual_rainfall_reset = annual_rainfall.reset()
 
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(func=daily_rainfall.reset(), trigger='cron', hour='9')
+scheduler.add_job(func=daily_rainfall_reset, trigger='cron', hour='9')
 scheduler.add_job(func=monthly_rainfall.reset(), trigger='cron',
                   year='*', month='*', day='first')
 scheduler.add_job(func=annual_rainfall.reset(), trigger='cron',
