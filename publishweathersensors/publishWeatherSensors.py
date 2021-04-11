@@ -105,12 +105,12 @@ class reportF016TH:
     channel: int
     battery: str
     temperature_F: float
+    mic: str
     humidity: int = dataclasses.field(metadata=desert.metadata(
         fields.Int(
             required=True,
             validate=validate.Range(min=0, max=100, error="Humidity must be between 0% and 100%"))
     ))
-    mic: str
 
     def to_reportIndoorSensor(self):
         return reportIndoorSensor(
@@ -169,7 +169,7 @@ class reportFT020T:
     device: int
     avewindspeed: int
     gustwindspeed: int
-    cumulativerain: str
+    cumulativerain: int
     temperature: float
     light: int
     uv: int
