@@ -182,7 +182,7 @@ class reportFT020T:
     winddirection: float = dataclasses.field(metadata=desert.metadata(
             fields.Float(
                 required=True,
-                validate=validate.Range(min=0, max=1, error="Battery state must be 0 or 1"))
+                validate=validate.Range(min=0, max=359, error="Wind direction must be a value between 0 and 359"))
     ))
     humidity: int = dataclasses.field(metadata=desert.metadata(
             fields.Int(
@@ -272,7 +272,9 @@ def run():
                 # data = parseF016TH(sLine)
                 schema = desert.schema(reportF016TH, meta={"unknown": EXCLUDE})
                 try:
+                    sys.stdout.write(json.loads(sLine) + '\n')
                     data = schema.load(json.loads(sLine)).to_reportIndoorSensor()
+                    sys.stdout.write(data + '\n')
                     topic = '/'.join(['weathersense', 'indoorth',
                                      str(data.channel)])
                 except ValidationError as err:
@@ -284,8 +286,10 @@ def run():
                 # data = parseFT020T(sLine)
                 schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
                 try:
+                    sys.stdout.write(json.loads(sLine) + '\n')
                     data = schema.load(json.loads(
                         sLine)).to_reportWeatherSensor()
+                    sys.stdout.write(data + '\n')
                     topic = '/'.join(['weathersense', 'weatherrack2',
                                  str(data.get('device'))])
                 except ValidationError as err:
