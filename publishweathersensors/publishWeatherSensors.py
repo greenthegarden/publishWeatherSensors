@@ -213,7 +213,7 @@ class reportFT020T:
         self.uv = self.uv/10.0
 
     def to_reportWeatherSensor(self):
-        return reportWeatherSensor(
+        return dataclasses.asdict(reportWeatherSensor(
             self.time,
             self.model,
             self.device,
@@ -228,7 +228,7 @@ class reportFT020T:
             self.batterylow,
             self.winddirection,
             self.humidity
-        )
+        ))
 
 
 def run():
