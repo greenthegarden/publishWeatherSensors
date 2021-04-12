@@ -1,6 +1,3 @@
-# test for WeatherSense SwitchDoc Labs Weather Sensors
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------------------------------------------------------------------------------
 from os import EX_DATAERR
 import sys
 from subprocess import PIPE, Popen, STDOUT
@@ -14,7 +11,6 @@ from marshmallow import EXCLUDE, fields, ValidationError, validate
 import desert
 
 from apscheduler.schedulers.background import BackgroundScheduler
-
 
 @dataclass
 class RainfallTotal:
@@ -61,21 +57,11 @@ scheduler.start()
 def nowStr() -> str:
     return(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-
-class EnhancedJSONEncoder(json.JSONEncoder):
-    def default(self, o):
-        if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-        return super().default(o)
-
-
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 #stripped = lambda s: "".join(i for i in s if 31 < ord(i) < 127)
 
 def tempFtoC(temp_F: int) -> float:
     return (temp_F - 32) * (5/9.0)
-
-
 
 @dataclass
 class reportIndoorSensor:
@@ -131,13 +117,6 @@ class reportF016TH:
             tempFtoC(self.temperature_F),
             self.humidity
         ))
-
-# def parseF016TH(sLine):
-#     data =
-#     data['temperature'] = tempFtoC(data.get('temperature_F'))
-#     data.pop('temperature_F', None)
-#     return data
-
 
 @dataclass
 class reportWeatherSensor:
