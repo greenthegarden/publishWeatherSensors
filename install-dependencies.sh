@@ -10,5 +10,5 @@ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 # install poetry
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
-# install supervisor
-python -m pip install --upgrade supervisor
+# install extensions from dependencies lock file
+poetry install
