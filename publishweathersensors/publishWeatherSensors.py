@@ -121,7 +121,7 @@ class reportF016TH:
     ))
 
     def to_reportIndoorSensor(self):
-        return reportIndoorSensor(
+        return dataclasses.asdict(reportIndoorSensor(
             self.time,
             self.model,
             self.device,
@@ -130,7 +130,7 @@ class reportF016TH:
             self.battery,
             tempFtoC(self.temperature_F),
             self.humidity
-        )
+        ))
 
 # def parseF016TH(sLine):
 #     data =
@@ -311,6 +311,6 @@ def run():
             if topic:
                 sys.stdout.write(json.dumps(data) + '\n')
                 publish.single(topic.lower(), json.dumps(
-                    data, cls=EnhancedJSONEncoder), hostname='192.168.1.53')
+                    data), hostname='192.168.1.53')
 
         sys.stdout.flush()
