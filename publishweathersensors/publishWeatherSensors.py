@@ -290,7 +290,7 @@ def run():
                     sys.stdout.write(sLine + '\n')
                     data = schema.load(json.loads(sLine)).to_reportIndoorSensor()
                     topic = '/'.join(['weathersense', 'indoorth',
-                                     str(data.channel)])
+                                     str(data.get('channel'))])
                 except ValidationError as err:
                     print(err.messages)
                     print(err.valid_data)
