@@ -4,22 +4,35 @@ from subprocess import PIPE, Popen, STDOUT
 from threading import Thread
 import json
 import datetime
+import redis
 import paho.mqtt.publish as publish
 import dataclasses
 from dataclasses import dataclass
 from marshmallow import EXCLUDE, fields, ValidationError, validate
 import desert
 
+r = redis.Redis(
+    host='127.0.0.1',
+    port=6379)
+
 from apscheduler.schedulers.background import BackgroundScheduler
 
 @dataclass
 class RainfallTotal:
+    key: str
     zero: float = 0.0
     total: float = 0.0
     cumulative: float = 0.0
 
+    def set_redis(self):
+        r.set(self.key, self.zero)
+
+    def get_redis(self):
+        self.zero = r.get(self.key)
+
     def reset(self): 
         self.zero = self.cumulative
+        self.set_redis()
 
     def update(self, cumulative: float) -> float:
         self.cumulative = cumulative
@@ -29,10 +42,16 @@ class RainfallTotal:
     def get_total(self) -> float:
         return self.total
 
+        # post init function
+    def __post_init__(self):
+        try:
+            self.get_redis()
+        except:
+            self.zero = 0
 
-daily_rainfall = RainfallTotal()
-monthly_rainfall = RainfallTotal()
-annual_rainfall = RainfallTotal()
+daily_rainfall = RainfallTotal('zero_daily')
+monthly_rainfall = RainfallTotal('zero_monthly')
+annual_rainfall = RainfallTotal('zero_annual')
 
 def daily_rainfall_reset():
   daily_rainfall.reset()
