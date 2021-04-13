@@ -47,7 +47,7 @@ class RainfallTotal:
         try:
             self.get_redis()
         except:
-            self.zero = 0
+            self.zero = 0.0
 
 daily_rainfall = RainfallTotal('zero_daily')
 monthly_rainfall = RainfallTotal('zero_monthly')
