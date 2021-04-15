@@ -11,6 +11,7 @@ marshmallow = "^3.10.0"
 desert = "^2020.11.18"
 APScheduler = "^3.7.0"
 redis = "^3.5.3"
+python-configuration = "^0.8.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

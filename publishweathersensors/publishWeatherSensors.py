@@ -10,6 +10,9 @@ import dataclasses
 from dataclasses import dataclass
 from marshmallow import EXCLUDE, fields, ValidationError, validate
 import desert
+import config_from_json
+
+cfg = config_from_json('config.json', read_from_file=True)
 
 r = redis.Redis(
     host='127.0.0.1',
@@ -154,7 +157,6 @@ class reportWeatherSensor:
     winddirection: int
     humidity: float
 
-
 # Data Sample
 # {"time" : "2020-11-22 06:40:15", "model" : "SwitchDoc Labs FT020T AIO", "device" : 12, "id" : 0, "batterylow" : 0, "avewindspeed" : 2, "gustwindspeed" : 3, "winddirection" : 18, "cumulativerain" : 180, "temperature" : 1011, "humidity" : 27, "light" : 1432, "uv" : 4, "mic" : "CRC"}
 
@@ -227,7 +229,6 @@ class reportFT020T:
             self.winddirection,
             self.humidity
         ))
-
 
 def run():
 
@@ -309,6 +310,6 @@ def run():
             if topic:
                 sys.stdout.write(json.dumps(data) + '\n')
                 publish.single(topic.lower(), json.dumps(
-                    data), hostname='192.168.1.53')
+                    data), hostname=cfg.broker_ip)
 
         sys.stdout.flush()
