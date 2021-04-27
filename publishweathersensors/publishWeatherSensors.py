@@ -7,12 +7,17 @@ import datetime
 import redis
 import paho.mqtt.publish as publish
 import dataclasses
-from dataclasses import dataclass
-from marshmallow import EXCLUDE, fields, ValidationError, validate
-import desert
-import config_from_json
+from pydantic.dataclasses import dataclass
+from pydantic import (
+    confloat,
+    conint,
+    ValidationError
+)
+# from marshmallow import EXCLUDE, fields, ValidationError, validate
+# import desert
+# import config_from_json
 
-cfg = config_from_json('config.json', read_from_file=True)
+# cfg = config_from_json('config.json', read_from_file=True)
 
 r = redis.Redis(
     host='127.0.0.1',
@@ -122,11 +127,7 @@ class reportF016TH:
     battery: str
     temperature_F: float
     mic: str
-    humidity: int = dataclasses.field(metadata=desert.metadata(
-        fields.Int(
-            required=True,
-            validate=validate.Range(min=0, max=100, error="Humidity must be between 0% and 100%"))
-    ))
+    humidity: int
 
     def to_reportIndoorSensor(self):
         return dataclasses.asdict(reportIndoorSensor(
@@ -178,29 +179,18 @@ class reportWeatherSensor:
 class reportFT020T:
     time: str
     model: str
-    device: int
-    avewindspeed: int
-    gustwindspeed: int
-    cumulativerain: int
-    temperature: float
-    light: int
-    uv: int
+    device: conint(ge=0)
+    id: conint(ge=0)
+    batterylow: conint(ge=0, le=1)
+    avewindspeed: conint(ge=0)
+    gustwindspeed: conint(ge=0)
+    winddirection: conint(ge=0, le=359)
+    cumulativerain: conint(ge=0)
+    temperature: confloat(ge=0, le=2000)
+    humidity: conint(ge=0, le=100)
+    light: conint(ge=0)
+    uv: conint(ge=0)
     mic: str
-    batterylow: int = dataclasses.field(metadata=desert.metadata(
-            fields.Int(
-                required=True,
-                validate=validate.Range(min=0, max=1, error="Battery state must be 0 or 1"))
-    ))
-    winddirection: float = dataclasses.field(metadata=desert.metadata(
-            fields.Float(
-                required=True,
-                validate=validate.Range(min=0, max=359, error="Wind direction must be a value between 0 and 359"))
-    ))
-    humidity: int = dataclasses.field(metadata=desert.metadata(
-            fields.Int(
-                required=True,
-                validate=validate.Range(min=0, max=100, error="Humidity must be between 0% and 100%"))
-    ))
 
     def __post_init__(self):
         """
@@ -232,84 +222,104 @@ class reportFT020T:
 
 def run():
 
-    # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-    # 146 = FT-020T WeatherRack2, #147 = F016TH SDL Temperature/Humidity Sensor
-    print("Starting Wireless Read")
-    #cmd = [ '/usr/local/bin/rtl_433', '-vv',  '-q', '-F', 'json', '-R', '146', '-R', '147']
-    cmd = ['/usr/local/bin/rtl_433', '-q',
-           '-F', 'json', '-R', '146', '-R', '147']
+  try:
+    report = reportFT020T(time="2020-11-22 06:40:15",
+                          model="SwitchDoc Labs FT020T AIO",
+                          device=12,
+                          id=0,
+                          batterylow=0,
+                          avewindspeed=2,
+                          gustwindspeed=3,
+                          winddirection=18,
+                          cumulativerain=180,
+                          temperature=1011,
+                          humidity=27,
+                          light=1432,
+                          uv=4,
+                          mic="CRC")
+    print(report)
+    print(report.to_reportWeatherSensor())
+  except ValidationError as err:
+    print(err.json())
+    
+    # # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # # 146 = FT-020T WeatherRack2, #147 = F016TH SDL Temperature/Humidity Sensor
+    # print("Starting Wireless Read")
+    # #cmd = [ '/usr/local/bin/rtl_433', '-vv',  '-q', '-F', 'json', '-R', '146', '-R', '147']
+    # cmd = ['/usr/local/bin/rtl_433', '-q',
+    #        '-F', 'json', '-R', '146', '-R', '147']
 
-    #   We're using a queue to capture output as it occurs
-    try:
-        from Queue import Queue, Empty
-    except ImportError:
-        from queue import Queue, Empty  # python 3.x
-    ON_POSIX = 'posix' in sys.builtin_module_names
+    # #   We're using a queue to capture output as it occurs
+    # try:
+    #     from Queue import Queue, Empty
+    # except ImportError:
+    #     from queue import Queue, Empty  # python 3.x
+    # ON_POSIX = 'posix' in sys.builtin_module_names
 
-    def enqueue_output(src, out, queue):
-        for line in iter(out.readline, b''):
-            queue.put((src, line))
-        out.close()
+    # def enqueue_output(src, out, queue):
+    #     for line in iter(out.readline, b''):
+    #         queue.put((src, line))
+    #     out.close()
 
-    #   Create our sub-process...
-    #   Note that we need to either ignore output from STDERR or merge it with STDOUT due to a limitation/bug somewhere under the covers of "subprocess"
-    #   > this took awhile to figure out a reliable approach for handling it...
-    p = Popen(cmd, stdout=PIPE, stderr=STDOUT, bufsize=1, close_fds=ON_POSIX)
-    q = Queue()
+    # #   Create our sub-process...
+    # #   Note that we need to either ignore output from STDERR or merge it with STDOUT due to a limitation/bug somewhere under the covers of "subprocess"
+    # #   > this took awhile to figure out a reliable approach for handling it...
+    # p = Popen(cmd, stdout=PIPE, stderr=STDOUT, bufsize=1, close_fds=ON_POSIX)
+    # q = Queue()
 
-    t = Thread(target=enqueue_output, args=('stdout', p.stdout, q))
+    # t = Thread(target=enqueue_output, args=('stdout', p.stdout, q))
 
-    t.daemon = True  # thread dies with the program
-    t.start()
+    # t.daemon = True  # thread dies with the program
+    # t.start()
 
-    # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    # # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    pulse = 0
-    while True:
-        #   Other processing can occur here as needed...
-        #sys.stdout.write('Made it to processing step. \n')
+    # pulse = 0
+    # while True:
+    #     #   Other processing can occur here as needed...
+    #     #sys.stdout.write('Made it to processing step. \n')
 
-        try:
-            src, line = q.get(timeout=1)
-            # print(line.decode())
-        except Empty:
-            pulse += 1
-        else:  # got line
-            pulse -= 1
-            sLine = line.decode()
-            data = dict()
-            topic = ""
-            # print(sLine)
-            #   See if the data is something we need to act on...
-            if ((sLine.find('F007TH') != -1) or (sLine.find('F016TH') != -1)):
-                sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')
-                # data = parseF016TH(sLine)
-                schema = desert.schema(reportF016TH, meta={"unknown": EXCLUDE})
-                try:
-                    sys.stdout.write(sLine + '\n')
-                    data = schema.load(json.loads(sLine)).to_reportIndoorSensor()
-                    topic = '/'.join(['weathersense', 'indoorth',
-                                     str(data.get('channel'))])
-                except ValidationError as err:
-                    print(err.messages)
-                    print(err.valid_data)
-            if ((sLine.find('FT0300') != -1) or (sLine.find('FT020T') != -1)):
-                sys.stdout.write(
-                    'WeatherSense WeatherRack2 FT020T found' + '\n')
-                # data = parseFT020T(sLine)
-                schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
-                try:
-                    sys.stdout.write(sLine + '\n')
-                    data = schema.load(json.loads(
-                        sLine)).to_reportWeatherSensor()
-                    topic = '/'.join(['weathersense', 'weatherrack2',
-                                 str(data.get('device'))])
-                except ValidationError as err:
-                    print(err.messages)
-                    print(err.valid_data)
-            if topic:
-                sys.stdout.write(json.dumps(data) + '\n')
-                publish.single(topic.lower(), json.dumps(
-                    data), hostname=cfg.broker_ip)
+    #     try:
+    #         src, line = q.get(timeout=1)
+    #         # print(line.decode())
+    #     except Empty:
+    #         pulse += 1
+    #     else:  # got line
+    #         pulse -= 1
+    #         sLine = line.decode()
+    #         data = dict()
+    #         topic = ""
+    #         # print(sLine)
+    #         #   See if the data is something we need to act on...
+    #         if ((sLine.find('F007TH') != -1) or (sLine.find('F016TH') != -1)):
+    #             sys.stdout.write('WeatherSense Indoor T/H F016TH Found' + '\n')
+    #             # data = parseF016TH(sLine)
+    #             schema = desert.schema(reportF016TH, meta={"unknown": EXCLUDE})
+    #             try:
+    #                 sys.stdout.write(sLine + '\n')
+    #                 data = schema.load(json.loads(sLine)).to_reportIndoorSensor()
+    #                 topic = '/'.join(['weathersense', 'indoorth',
+    #                                  str(data.get('channel'))])
+    #             except ValidationError as err:
+    #                 print(err.messages)
+    #                 print(err.valid_data)
+    #         if ((sLine.find('FT0300') != -1) or (sLine.find('FT020T') != -1)):
+    #             sys.stdout.write(
+    #                 'WeatherSense WeatherRack2 FT020T found' + '\n')
+    #             # data = parseFT020T(sLine)
+    #             schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
+    #             try:
+    #                 sys.stdout.write(sLine + '\n')
+    #                 data = schema.load(json.loads(
+    #                     sLine)).to_reportWeatherSensor()
+    #                 topic = '/'.join(['weathersense', 'weatherrack2',
+    #                              str(data.get('device'))])
+    #             except ValidationError as err:
+    #                 print(err.messages)
+    #                 print(err.valid_data)
+    #         if topic:
+    #             sys.stdout.write(json.dumps(data) + '\n')
+    #             publish.single(topic.lower(), json.dumps(
+    #                 data), hostname=cfg.broker_ip)
 
-        sys.stdout.flush()
+    #     sys.stdout.flush()
