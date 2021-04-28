@@ -92,16 +92,6 @@ def nowStr() -> str:
 def tempFtoC(temp_F: int) -> float:
     return (temp_F - 32) * (5/9.0)
 
-@dataclass
-class reportIndoorSensor:
-    time: str
-    model: str
-    device: int
-    modelnumber: int
-    channel: int
-    battery: str
-    temperature: float
-    humidity: float
 
 # For data details see https://shop.switchdoc.com/products/wireless-weatherrack2
 
@@ -119,8 +109,7 @@ class reportIndoorSensor:
 # humidity: Relative Humidity in %.
 # mic: "CRC" ???
 
-@dataclass
-class reportF016TH:
+class reportF016TH(BaseModel):
     time: str
     model: str
     device: int
@@ -128,20 +117,18 @@ class reportF016TH:
     channel: int
     battery: str
     temperature_F: float
+    humidity: conint(ge=0, le=100)
     mic: str
-    humidity: int
 
-    def to_reportIndoorSensor(self):
-        return dataclasses.asdict(reportIndoorSensor(
-            self.time,
-            self.model,
-            self.device,
-            self.modelnumber,
-            self.channel,
-            self.battery,
-            tempFtoC(self.temperature_F),
-            self.humidity
-        ))
+class reportIndoorSensor(BaseModel):
+    time: str
+    model: str
+    device: int
+    modelnumber: int
+    channel: int
+    battery: str
+    temperature: float
+    humidity: conint(ge=0, le=100)
 
 # Data Sample
 # {"time" : "2020-11-22 06:40:15", "model" : "SwitchDoc Labs FT020T AIO", "device" : 12, "id" : 0, "batterylow" : 0, "avewindspeed" : 2, "gustwindspeed" : 3, "winddirection" : 18, "cumulativerain" : 180, "temperature" : 1011, "humidity" : 27, "light" : 1432, "uv" : 4, "mic" : "CRC"}
@@ -204,6 +191,29 @@ class reportWeatherSensor(BaseModel):
     annualrainfall: confloat(ge=0)
 
 def run():
+
+  try:
+    report = reportF016TH(time="2020-07-09 10:54:16",
+                          model="SwitchDoc Labs F007TH Thermo-Hygrometer",
+                          device=233,
+                          modelnumber=5,
+                          channel=3,
+                          battery="OK",
+                          temperature_F=72.100,
+                          humidity=45,
+                          mic="CRC")
+    print("report = " + report.json())
+    reportis = reportIndoorSensor(time=report.time,
+                                   model=report.model,
+                                   device=report.device,
+                                   modelnumber=report.modelnumber,
+                                   channel=report.channel,
+                                   battery=report.battery,
+                                   temperature=tempFtoC(report.temperature_F),
+                                   humidity=report.humidity)
+    print("reportis = " + reportis.json())
+  except ValidationError as err:
+    print(err.json())
 
   try:
     report = reportFT020T(time="2020-11-22 06:40:15",
