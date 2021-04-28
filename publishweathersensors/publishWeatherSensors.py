@@ -9,8 +9,10 @@ import paho.mqtt.publish as publish
 import dataclasses
 from pydantic.dataclasses import dataclass
 from pydantic import (
+    BaseModel,
     confloat,
     conint,
+    validator,
     ValidationError
 )
 # from marshmallow import EXCLUDE, fields, ValidationError, validate
@@ -141,23 +143,6 @@ class reportF016TH:
             self.humidity
         ))
 
-@dataclass
-class reportWeatherSensor:
-    time: str
-    model: str
-    device: int
-    avewindspeed: int
-    gustwindspeed: int
-    dailyrainfall: float
-    monthlyrainfall: float
-    annualrainfall: float
-    temperature: float
-    light: int
-    uv: int
-    batterylow: float
-    winddirection: int
-    humidity: float
-
 # Data Sample
 # {"time" : "2020-11-22 06:40:15", "model" : "SwitchDoc Labs FT020T AIO", "device" : 12, "id" : 0, "batterylow" : 0, "avewindspeed" : 2, "gustwindspeed" : 3, "winddirection" : 18, "cumulativerain" : 180, "temperature" : 1011, "humidity" : 27, "light" : 1432, "uv" : 4, "mic" : "CRC"}
 
@@ -175,8 +160,8 @@ class reportWeatherSensor:
 # light: Visible Sunlight in lux.
 # uv: UV Index * 10
 # "mic": "CRC" ???
-@dataclass
-class reportFT020T:
+# @dataclass
+class reportFT020T(BaseModel):
     time: str
     model: str
     device: conint(ge=0)
@@ -192,33 +177,31 @@ class reportFT020T:
     uv: conint(ge=0)
     mic: str
 
-    def __post_init__(self):
-        """
-        Update the numeric fields to return correct values
-        """
-        self.avewindspeed =  self.avewindspeed/10.0
-        self.gustwindspeed = self.gustwindspeed/10.0
-        self.cumulativerain = self.cumulativerain/10.0
-        self.temperature = tempFtoC((self.temperature-400)/10.0)
-        self.uv = self.uv/10.0
+    @validator('avewindspeed', always=True)
+    def avewindspeed_correction(cls, v):
+        return v/10.0
 
-    def to_reportWeatherSensor(self):
-        return dataclasses.asdict(reportWeatherSensor(
-            self.time,
-            self.model,
-            self.device,
-            self.avewindspeed,
-            self.gustwindspeed,
-            daily_rainfall.update(self.cumulativerain),
-            monthly_rainfall.update(self.cumulativerain),
-            annual_rainfall.update(self.cumulativerain),
-            self.temperature,
-            self.light,
-            self.uv,
-            self.batterylow,
-            self.winddirection,
-            self.humidity
-        ))
+    @validator('gustwindspeed', always=True)
+    def gustwindspeed_correction(cls, v):
+        return v/10.0
+
+    @validator('cumulativerain', always=True)
+    def cumulativerain_correction(cls, v):
+        return v/10.0
+
+    @validator('temperature', always=True)
+    def temperature_correction(cls, v):
+        return tempFtoC((v-400)/10.0)
+
+    @validator('uv', always=True)
+    def uv_correction(cls, v):
+        return v/10.0
+
+class reportWeatherSensor(BaseModel):
+    report: reportFT020T
+    dailyrainfall: confloat(ge=0)
+    monthlyrainfall: confloat(ge=0)
+    annualrainfall: confloat(ge=0)
 
 def run():
 
@@ -231,14 +214,19 @@ def run():
                           avewindspeed=2,
                           gustwindspeed=3,
                           winddirection=18,
-                          cumulativerain=180,
+                          cumulativerain=190,
                           temperature=1011,
                           humidity=27,
                           light=1432,
                           uv=4,
                           mic="CRC")
-    print(report)
-    print(report.to_reportWeatherSensor())
+    print("report = " + report.json())
+    reportws = reportWeatherSensor(report=report,
+    dailyrainfall = daily_rainfall.update(report.cumulativerain),
+    monthlyrainfall = monthly_rainfall.update(report.cumulativerain),
+    annualrainfall = annual_rainfall.update(report.cumulativerain)
+    )
+    print("reportws = " + reportws.json())
   except ValidationError as err:
     print(err.json())
     
@@ -310,7 +298,7 @@ def run():
     #             schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
     #             try:
     #                 sys.stdout.write(sLine + '\n')
-    #                 data = schema.load(json.loads(
+    #                 data = parseFT020T.parse_raw(json.loads(
     #                     sLine)).to_reportWeatherSensor()
     #                 topic = '/'.join(['weathersense', 'weatherrack2',
     #                              str(data.get('device'))])
