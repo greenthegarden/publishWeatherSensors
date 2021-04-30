@@ -52,16 +52,19 @@ class RainfallTotal:
     def get_total(self) -> float:
         return self.total
 
-        # post init function
     def __post_init__(self):
         try:
             self.get_redis()
         except:
             self.zero = 0.0
 
-daily_rainfall = RainfallTotal('zero_daily')
-monthly_rainfall = RainfallTotal('zero_monthly')
-annual_rainfall = RainfallTotal('zero_annual')
+# daily_rainfall = RainfallTotal('zero_daily')
+# monthly_rainfall = RainfallTotal('zero_monthly')
+# annual_rainfall = RainfallTotal('zero_annual')
+
+daily_rainfall = 0.0
+monthly_rainfall = 0.0
+annual_rainfall = 0.0
 
 def daily_rainfall_reset():
   daily_rainfall.reset()
