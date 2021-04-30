@@ -195,53 +195,53 @@ class reportWeatherSensor(BaseModel):
 
 def run():
 
-  try:
-    report = reportF016TH(time="2020-07-09 10:54:16",
-                          model="SwitchDoc Labs F007TH Thermo-Hygrometer",
-                          device=233,
-                          modelnumber=5,
-                          channel=3,
-                          battery="OK",
-                          temperature_F=72.100,
-                          humidity=45,
-                          mic="CRC")
-    print("report = " + report.json())
-    reportis = reportIndoorSensor(time=report.time,
-                                   model=report.model,
-                                   device=report.device,
-                                   modelnumber=report.modelnumber,
-                                   channel=report.channel,
-                                   battery=report.battery,
-                                   temperature=tempFtoC(report.temperature_F),
-                                   humidity=report.humidity)
-    print("reportis = " + reportis.json())
-  except ValidationError as err:
-    print(err.json())
+  # try:
+  #   report = reportF016TH(time="2020-07-09 10:54:16",
+  #                         model="SwitchDoc Labs F007TH Thermo-Hygrometer",
+  #                         device=233,
+  #                         modelnumber=5,
+  #                         channel=3,
+  #                         battery="OK",
+  #                         temperature_F=72.100,
+  #                         humidity=45,
+  #                         mic="CRC")
+  #   print("report = " + report.json())
+  #   reportis = reportIndoorSensor(time=report.time,
+  #                                  model=report.model,
+  #                                  device=report.device,
+  #                                  modelnumber=report.modelnumber,
+  #                                  channel=report.channel,
+  #                                  battery=report.battery,
+  #                                  temperature=tempFtoC(report.temperature_F),
+  #                                  humidity=report.humidity)
+  #   print("reportis = " + reportis.json())
+  # except ValidationError as err:
+  #   print(err.json())
 
-  try:
-    report = reportFT020T(time="2020-11-22 06:40:15",
-                          model="SwitchDoc Labs FT020T AIO",
-                          device=12,
-                          id=0,
-                          batterylow=0,
-                          avewindspeed=2,
-                          gustwindspeed=3,
-                          winddirection=18,
-                          cumulativerain=190,
-                          temperature=1011,
-                          humidity=27,
-                          light=1432,
-                          uv=4,
-                          mic="CRC")
-    print("report = " + report.json())
-    reportws = reportWeatherSensor(report=report,
-    dailyrainfall = daily_rainfall.update(report.cumulativerain),
-    monthlyrainfall = monthly_rainfall.update(report.cumulativerain),
-    annualrainfall = annual_rainfall.update(report.cumulativerain)
-    )
-    print("reportws = " + reportws.json())
-  except ValidationError as err:
-    print(err.json())
+  # try:
+  #   report = reportFT020T(time="2020-11-22 06:40:15",
+  #                         model="SwitchDoc Labs FT020T AIO",
+  #                         device=12,
+  #                         id=0,
+  #                         batterylow=0,
+  #                         avewindspeed=2,
+  #                         gustwindspeed=3,
+  #                         winddirection=18,
+  #                         cumulativerain=190,
+  #                         temperature=1011,
+  #                         humidity=27,
+  #                         light=1432,
+  #                         uv=4,
+  #                         mic="CRC")
+  #   print("report = " + report.json())
+  #   reportws = reportWeatherSensor(report=report,
+  #   dailyrainfall = daily_rainfall.update(report.cumulativerain),
+  #   monthlyrainfall = monthly_rainfall.update(report.cumulativerain),
+  #   annualrainfall = annual_rainfall.update(report.cumulativerain)
+  #   )
+  #   print("reportws = " + reportws.json())
+  # except ValidationError as err:
+  #   print(err.json())
     
     # ---------------------------------------------------------------------------------------------------------------------------------------------------------------
     # 146 = FT-020T WeatherRack2, #147 = F016TH SDL Temperature/Humidity Sensor
@@ -317,7 +317,7 @@ def run():
                 sys.stdout.write(
                     'WeatherSense WeatherRack2 FT020T found' + '\n')
                 # data = parseFT020T(sLine)
-                schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
+                # schema = desert.schema(reportFT020T, meta={"unknown": EXCLUDE})
                 try:
                     sys.stdout.write(sLine + '\n')
                     report = reportFT020T.parse_raw(sLine)
