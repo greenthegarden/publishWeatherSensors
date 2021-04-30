@@ -335,7 +335,9 @@ def run():
                     print(str(err))
             if topic:
                 sys.stdout.write(json.dumps(data) + '\n')
+                # publish.single(topic.lower(), json.dumps(
+                #     data), hostname=cfg.broker_ip)
                 publish.single(topic.lower(), json.dumps(
-                    data), hostname=cfg.broker_ip)
+                    data), hostname='192.168.1.53')
 
         sys.stdout.flush()
