@@ -187,8 +187,8 @@ class reportFT020T(BaseModel):
 class reportWeatherSensor(BaseModel):
   report: reportFT020T
   dailyrainfall: confloat(ge=0)
-  monthlyrainfall: confloat(ge=0)
-  annualrainfall: confloat(ge=0)
+  # monthlyrainfall: confloat(ge=0)
+  # annualrainfall: confloat(ge=0)
 
 def run():
 
@@ -319,10 +319,6 @@ def run():
           report = reportFT020T.parse_raw(sLine)
           data = json.loads(reportWeatherSensor(report=report,
                                                 dailyrainfall=daily_rainfall.update(
-                                                    report.cumulativerain),
-                                                monthlyrainfall=monthly_rainfall.update(
-                                                    report.cumulativerain),
-                                                annualrainfall=annual_rainfall.update(
                                                     report.cumulativerain)
                                                 ).json())
           topic = '/'.join(['weathersense', 'weatherrack2', str(data.get('device'))])
@@ -335,3 +331,8 @@ def run():
         publish.single(topic.lower(), json.dumps(data), hostname='192.168.1.53')
 
     sys.stdout.flush()
+
+                                                # monthlyrainfall=monthly_rainfall.update(
+                                                #     report.cumulativerain),
+                                                # annualrainfall=annual_rainfall.update(
+                                                #     report.cumulativerain)
