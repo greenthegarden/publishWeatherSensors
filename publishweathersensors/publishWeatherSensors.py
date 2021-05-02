@@ -55,8 +55,8 @@ class RainfallTotal:
       self.zero = 0.0
 
 daily_rainfall = RainfallTotal('zero_daily')
-monthly_rainfall = RainfallTotal('zero_monthly')
-annual_rainfall = RainfallTotal('zero_annual')
+# monthly_rainfall = RainfallTotal('zero_monthly')
+# annual_rainfall = RainfallTotal('zero_annual')
 
 # daily_rainfall = 0.0
 # monthly_rainfall = 0.0
@@ -65,11 +65,11 @@ annual_rainfall = RainfallTotal('zero_annual')
 def daily_rainfall_reset():
   daily_rainfall.reset()
 
-def monthly_rainfall_reset():
-  monthly_rainfall.reset()
+# def monthly_rainfall_reset():
+#   monthly_rainfall.reset()
 
-def annual_rainfall_reset():
-  annual_rainfall.reset()
+# def annual_rainfall_reset():
+#   annual_rainfall.reset()
 
 # scheduler = BackgroundScheduler(daemon=True)
 # scheduler.add_job(func=daily_rainfall_reset, trigger='cron', hour='9')
