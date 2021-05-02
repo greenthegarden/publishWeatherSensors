@@ -186,7 +186,7 @@ class reportFT020T(BaseModel):
 
 class reportWeatherSensor(BaseModel):
   report: reportFT020T
-  dailyrainfall: confloat(ge=0)
+  # dailyrainfall: confloat(ge=0)
   # monthlyrainfall: confloat(ge=0)
   # annualrainfall: confloat(ge=0)
 
@@ -317,9 +317,7 @@ def run():
         try:
           sys.stdout.write(sLine + '\n')
           report = reportFT020T.parse_raw(sLine)
-          data = json.loads(reportWeatherSensor(report=report,
-                                                dailyrainfall=daily_rainfall.update(
-                                                    report.cumulativerain)
+          data = json.loads(reportWeatherSensor(report=report
                                                 ).json())
           topic = '/'.join(['weathersense', 'weatherrack2', str(data.get('device'))])
         except ValidationError as err:
@@ -332,6 +330,8 @@ def run():
 
     sys.stdout.flush()
 
+                                                # dailyrainfall=daily_rainfall.update(
+                                                #     report.cumulativerain)
                                                 # monthlyrainfall=monthly_rainfall.update(
                                                 #     report.cumulativerain),
                                                 # annualrainfall=annual_rainfall.update(
