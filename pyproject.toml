@@ -13,6 +13,7 @@ APScheduler = "^3.7.0"
 redis = "^3.5.3"
 python-configuration = "^0.8.2"
 pydantic = "^1.8.1"
+appmap = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

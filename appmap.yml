@@ -1,0 +1,4 @@
+name: publishweathersensors
+packages:
+- path: publishweathersensors.main
+- path: publishweathersensors.publishweathersensors
