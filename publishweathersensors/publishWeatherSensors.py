@@ -19,42 +19,42 @@ from pydantic import (
 
 # cfg = config_from_json('config.json', read_from_file=True)
 
-r = redis.Redis(
-  host='127.0.0.1',
-  port=6379)
+# r = redis.Redis(
+#   host='127.0.0.1',
+#   port=6379)
 
-@dataclass
-class RainfallTotal:
-  key: str
-  zero: float = 0.0
-  total: float = 0.0
-  cumulative: float = 0.0
+# @dataclass
+# class RainfallTotal:
+#   key: str
+#   zero: float = 0.0
+#   total: float = 0.0
+#   cumulative: float = 0.0
 
-  def set_redis(self):
-    r.set(self.key, self.zero)
+#   def set_redis(self):
+#     r.set(self.key, self.zero)
 
-  def get_redis(self):
-    self.zero = r.get(self.key)
+#   def get_redis(self):
+#     self.zero = r.get(self.key)
 
-  def reset(self): 
-    self.zero = self.cumulative
-    self.set_redis()
+#   def reset(self): 
+#     self.zero = self.cumulative
+#     self.set_redis()
 
-  def update(self, cumulative: float) -> float:
-    self.cumulative = cumulative
-    self.total = cumulative - self.zero
-    return self.total
+#   def update(self, cumulative: float) -> float:
+#     self.cumulative = cumulative
+#     self.total = cumulative - self.zero
+#     return self.total
 
-  def get_total(self) -> float:
-    return self.total
+#   def get_total(self) -> float:
+#     return self.total
 
-  def __post_init__(self):
-    try:
-      self.get_redis()
-    except:
-      self.zero = 0.0
+#   def __post_init__(self):
+#     try:
+#       self.get_redis()
+#     except:
+#       self.zero = 0.0
 
-daily_rainfall = RainfallTotal('zero_daily')
+# daily_rainfall = RainfallTotal('zero_daily')
 # monthly_rainfall = RainfallTotal('zero_monthly')
 # annual_rainfall = RainfallTotal('zero_annual')
 
@@ -62,8 +62,8 @@ daily_rainfall = RainfallTotal('zero_daily')
 # monthly_rainfall = 0.0
 # annual_rainfall = 0.0
 
-def daily_rainfall_reset():
-  daily_rainfall.reset()
+# def daily_rainfall_reset():
+#   daily_rainfall.reset()
 
 # def monthly_rainfall_reset():
 #   monthly_rainfall.reset()
@@ -326,7 +326,7 @@ def run():
         sys.stdout.write(json.dumps(data) + '\n')
         # publish.single(topic.lower(), json.dumps(
         #     data), hostname=cfg.broker_ip)
-        publish.single(topic.lower(), json.dumps(data), hostname='192.168.1.53')
+        publish.single(topic.lower(), json.dumps(data), hostname='home-assistant')
 
     sys.stdout.flush()
 

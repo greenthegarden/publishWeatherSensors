@@ -4,6 +4,7 @@
     "*.yaml": "home-assistant"
   },
   "sonarlint.connectedMode.project": {
+    "connectionId": "mySonar",
     "projectKey": "publishweathersensors"
   }
 }
