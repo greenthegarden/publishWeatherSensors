@@ -318,7 +318,7 @@ def run():
           sys.stdout.write(sLine + '\n')
           report = reportFT020T.parse_raw(sLine)
           data = json.loads(reportWeatherSensor(report=report
-                                                ).json())
+                                                ).json()).get('report')
           topic = '/'.join(['weathersense', 'weatherrack2', str(data.get('device'))])
         except ValidationError as err:
           print(str(err))
