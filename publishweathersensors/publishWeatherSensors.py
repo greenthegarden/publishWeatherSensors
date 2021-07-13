@@ -324,6 +324,7 @@ def run():
           print(str(err))
       if topic:
         sys.stdout.write(json.dumps(data) + '\n')
+        sys.stdout.write("Published to topic" + topic + '\n')
         # publish.single(topic.lower(), json.dumps(
         #     data), hostname=cfg.broker_ip)
         publish.single(topic.lower(), json.dumps(data), hostname='home-assistant')
